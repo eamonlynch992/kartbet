@@ -3,766 +3,176 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KartBet — Bucks Party Racing</title>
+<title>Dave-Bucks-Bet 🏁</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');
-
-  :root {
-    --bg: #0a0c10;
-    --surface: #12151c;
-    --surface2: #1a1f2b;
-    --surface3: #222736;
-    --border: #2a3040;
-    --accent: #f0b429;
-    --accent2: #e8821a;
-    --green: #22c55e;
-    --red: #ef4444;
-    --blue: #3b82f6;
-    --text: #e8eaf0;
-    --text2: #8892a4;
-    --text3: #555f72;
-    --radius: 10px;
-    --radius-lg: 16px;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Barlow', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* NOISE TEXTURE OVERLAY */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.4;
-  }
-
-  /* ===== NAV ===== */
-  #nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    background: rgba(10,12,16,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    height: 56px;
-  }
-
-  .nav-logo {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900;
-    font-size: 22px;
-    letter-spacing: 1px;
-    color: var(--accent);
-    text-transform: uppercase;
-  }
-  .nav-logo span { color: var(--text2); font-weight: 400; }
-  #sync-dot {
-    display: inline-block;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--text3);
-    margin-left: 6px;
-    vertical-align: middle;
-    transition: background 0.4s;
-  }
-  #sync-dot.synced { background: var(--green); }
-
-  .nav-tabs {
-    display: flex;
-    gap: 4px;
-  }
-
-  .nav-tab {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    padding: 6px 14px;
-    border-radius: 6px;
-    border: none;
-    background: transparent;
-    color: var(--text2);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .nav-tab:hover { color: var(--text); background: var(--surface2); }
-  .nav-tab.active { background: var(--accent); color: #000; }
-  .nav-tab.locked { opacity: 0.4; cursor: not-allowed; }
-
-  /* ===== PAGES ===== */
-  .page {
-    display: none;
-    padding-top: 72px;
-    min-height: 100vh;
-    animation: fadeIn 0.3s ease;
-  }
-  .page.active { display: block; }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .container {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 20px 16px 60px;
-  }
-
-  /* ===== TYPOGRAPHY ===== */
-  .page-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900;
-    font-size: 36px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-  .page-subtitle {
-    color: var(--text2);
-    font-size: 14px;
-    margin-bottom: 28px;
-    font-weight: 400;
-  }
-
-  /* ===== CARDS ===== */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    margin-bottom: 16px;
-  }
-
-  .card-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--text2);
-    margin-bottom: 14px;
-  }
-
-  /* ===== INPUTS ===== */
-  input[type=text], input[type=password], select {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    padding: 12px 14px;
-    font-family: 'Barlow', sans-serif;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.2s;
-    -webkit-appearance: none;
-  }
-  input[type=text]:focus, input[type=password]:focus, select:focus {
-    border-color: var(--accent);
-  }
-  input::placeholder { color: var(--text3); }
-
-  /* ===== BUTTONS ===== */
-  .btn {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 12px 24px;
-    border-radius: var(--radius);
-    border: none;
-    cursor: pointer;
-    transition: all 0.18s;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .btn-primary {
-    background: var(--accent);
-    color: #000;
-  }
-  .btn-primary:hover:not(:disabled) {
-    background: var(--accent2);
-    transform: translateY(-1px);
-  }
-  .btn-primary:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-    transform: none;
-  }
-  .btn-secondary {
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-  .btn-secondary:hover { background: var(--surface3); }
-  .btn-danger {
-    background: rgba(239,68,68,0.15);
-    color: var(--red);
-    border: 1px solid rgba(239,68,68,0.3);
-  }
-  .btn-danger:hover { background: rgba(239,68,68,0.25); }
-  .btn-success {
-    background: rgba(34,197,94,0.15);
-    color: var(--green);
-    border: 1px solid rgba(34,197,94,0.3);
-  }
-  .btn-success:hover { background: rgba(34,197,94,0.25); }
-  .btn-sm { padding: 6px 12px; font-size: 12px; }
-  .btn-full { width: 100%; justify-content: center; }
-
-  /* ===== ODDS TABLE ===== */
-  .odds-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  .odds-table th {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--text3);
-    padding: 8px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-  .odds-table td {
-    padding: 10px 12px;
-    font-size: 14px;
-    border-bottom: 1px solid rgba(42,48,64,0.5);
-  }
-  .odds-table tr:last-child td { border-bottom: none; }
-  .odds-table tr:hover td { background: rgba(255,255,255,0.02); }
-
-  .driver-rank {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    color: var(--text3);
-    width: 28px;
-  }
-  .driver-name { font-weight: 500; }
-  .odds-badge {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800;
-    font-size: 16px;
-    padding: 3px 10px;
-    border-radius: 6px;
-    display: inline-block;
-  }
-  .odds-fav { background: rgba(34,197,94,0.15); color: var(--green); }
-  .odds-mid { background: rgba(240,180,41,0.12); color: var(--accent); }
-  .odds-long { background: rgba(239,68,68,0.15); color: var(--red); }
-
-  .cat-badge {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 10px;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 4px;
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 5px;
-    white-space: nowrap;
-  }
-  .cat-fav      { background: rgba(34,197,94,0.12);  color: var(--green);  border: 1px solid rgba(34,197,94,0.25); }
-  .cat-possible { background: rgba(59,130,246,0.12); color: #60a5fa;        border: 1px solid rgba(59,130,246,0.25); }
-  .cat-underdog { background: rgba(240,180,41,0.12); color: var(--accent);  border: 1px solid rgba(240,180,41,0.25); }
-  .cat-hailmary { background: rgba(239,68,68,0.12);  color: var(--red);     border: 1px solid rgba(239,68,68,0.25); }
-
-  /* ===== DRAG & DROP RANKING ===== */
-  .rank-list {
-    list-style: none;
-  }
-  .rank-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 6px;
-    cursor: grab;
-    transition: all 0.15s;
-    user-select: none;
-    touch-action: none;
-  }
-  .rank-item:active { cursor: grabbing; }
-  .rank-item.dragging {
-    opacity: 0.5;
-    background: var(--surface3);
-    border-color: var(--accent);
-  }
-  .rank-item.drag-over {
-    border-color: var(--accent);
-    background: rgba(240,180,41,0.06);
-    transform: scale(1.01);
-  }
-  .rank-number {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800;
-    font-size: 18px;
-    color: var(--accent);
-    width: 28px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-  .rank-driver { flex: 1; font-weight: 500; font-size: 15px; }
-  .drag-handle {
-    color: var(--text3);
-    font-size: 16px;
-    flex-shrink: 0;
-  }
-
-  /* ===== BET SELECTION ===== */
-  .event-section {
-    margin-bottom: 20px;
-  }
-  .event-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: var(--text);
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .event-counter {
-    font-size: 12px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    background: var(--surface2);
-    color: var(--text2);
-    letter-spacing: 0;
-  }
-  .event-counter.complete { background: rgba(34,197,94,0.15); color: var(--green); }
-
-  .driver-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-  }
-  .driver-bet-btn {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    background: var(--surface2);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: left;
-  }
-  .driver-bet-btn:hover { border-color: var(--accent); background: rgba(240,180,41,0.05); }
-  .driver-bet-btn.selected {
-    border-color: var(--accent);
-    background: rgba(240,180,41,0.1);
-  }
-  .driver-bet-btn .dname {
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--text);
-  }
-  .driver-bet-btn .dodds {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800;
-    font-size: 14px;
-    color: var(--accent);
-  }
-  .driver-bet-btn.selected .dname { color: var(--accent); }
-  .check-icon { display: none; color: var(--green); font-size: 14px; }
-  .driver-bet-btn.selected .check-icon { display: inline; }
-
-  /* ===== TOAST ===== */
-  #toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px 24px;
-    font-weight: 500;
-    font-size: 14px;
-    z-index: 1000;
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    white-space: nowrap;
-  }
-  #toast.show { transform: translateX(-50%) translateY(0); }
-  #toast.success { border-color: var(--green); color: var(--green); }
-  #toast.error { border-color: var(--red); color: var(--red); }
-
-  /* ===== STATUS BANNER ===== */
-  .status-banner {
-    background: linear-gradient(135deg, rgba(240,180,41,0.1), rgba(232,130,26,0.1));
-    border: 1px solid rgba(240,180,41,0.3);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    color: var(--accent);
-    font-weight: 500;
-  }
-
-  /* ===== ADMIN ===== */
-  .stat-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  .stat-box {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px;
-    text-align: center;
-  }
-  .stat-num {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900;
-    font-size: 32px;
-    color: var(--accent);
-    line-height: 1;
-  }
-  .stat-label {
-    font-size: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--text3);
-    margin-top: 4px;
-    font-weight: 600;
-  }
-
-  .bet-log-item {
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .bet-log-item:last-child { border-bottom: none; }
-  .bet-log-name {
-    font-weight: 700;
-    font-size: 15px;
-    margin-bottom: 4px;
-  }
-  .bet-log-detail {
-    font-size: 12px;
-    color: var(--text2);
-    line-height: 1.6;
-  }
-  .bet-log-detail strong { color: var(--text); }
-
-  .driver-admin-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(42,48,64,0.5);
-  }
-  .driver-admin-row:last-child { border-bottom: none; }
-  .driver-admin-row input {
-    padding: 7px 10px;
-    font-size: 14px;
-  }
-
-  .section-divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 24px 0;
-  }
-
-  .result-event {
-    margin-bottom: 16px;
-  }
-  .result-event-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: var(--text2);
-    margin-bottom: 8px;
-  }
-
-  /* winners display */
-  .winner-card {
-    background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(34,197,94,0.03));
-    border: 1px solid rgba(34,197,94,0.25);
-    border-radius: var(--radius);
-    padding: 14px;
-    margin-bottom: 10px;
-  }
-  .winner-card .event-label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--green);
-    margin-bottom: 6px;
-  }
-  .winner-card .winning-driver {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 26px;
-    font-weight: 900;
-    color: var(--text);
-    margin-bottom: 8px;
-  }
-  .winner-bettors {
-    font-size: 13px;
-    color: var(--text2);
-    line-height: 1.7;
-  }
-  .winner-bettors .bettor-name {
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .lock-banner {
-    background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0.05));
-    border: 1px solid rgba(239,68,68,0.3);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    font-size: 13px;
-    color: var(--red);
-    font-weight: 500;
-  }
-
-  .admin-login {
-    max-width: 360px;
-    margin: 60px auto;
-  }
-
-  .tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-  .tag-green { background: rgba(34,197,94,0.15); color: var(--green); }
-  .tag-red { background: rgba(239,68,68,0.15); color: var(--red); }
-  .tag-yellow { background: rgba(240,180,41,0.15); color: var(--accent); }
-
-  .flex { display: flex; }
-  .gap-8 { gap: 8px; }
-  .mb-8 { margin-bottom: 8px; }
-  .mb-12 { margin-bottom: 12px; }
-  .mt-16 { margin-top: 16px; }
-
-  /* mobile tweaks */
-  @media (max-width: 480px) {
-    #nav {
-      height: auto;
-      flex-direction: column;
-      align-items: stretch;
-      padding: 8px 12px 6px;
-      gap: 6px;
-    }
-    .nav-logo { font-size: 16px; }
-    .nav-tabs {
-      display: flex;
-      justify-content: stretch;
-      gap: 4px;
-    }
-    .nav-tab {
-      flex: 1;
-      text-align: center;
-      font-size: 11px;
-      padding: 7px 4px;
-      letter-spacing: 0.5px;
-    }
-    .page { padding-top: 100px; }
-    .driver-grid { grid-template-columns: 1fr; }
-    .stat-row { grid-template-columns: repeat(3, 1fr); }
-    .stat-num { font-size: 26px; }
-    .page-title { font-size: 28px; }
-  }
-
-  /* scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-  /* admin tabs */
-  .admin-tabs {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 4px;
-  }
-  .admin-tab {
-    flex: 1;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 8px 6px;
-    border-radius: 6px;
-    border: none;
-    background: transparent;
-    color: var(--text2);
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-  }
-  .admin-tab.active { background: var(--surface3); color: var(--text); }
-  .admin-tab:hover:not(.active) { color: var(--text); }
-
-  .admin-section { display: none; }
-  .admin-section.active { display: block; }
-
-  .inline-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-  .inline-row input { flex: 1; }
+  :root{--bg:#0a0c10;--surface:#12151c;--surface2:#1a1f2b;--surface3:#222736;--border:#2a3040;--accent:#f0b429;--accent2:#e8821a;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--text:#e8eaf0;--text2:#8892a4;--text3:#555f72;--radius:10px;--radius-lg:16px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.4}
+  #nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px}
+  .nav-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;letter-spacing:1px;color:var(--accent);text-transform:uppercase}
+  .nav-logo span{color:var(--text2);font-weight:400}
+  #sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--text3);margin-left:6px;vertical-align:middle;transition:background .4s}
+  #sync-dot.synced{background:var(--green)}
+  .nav-tabs{display:flex;gap:4px}
+  .nav-tab{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.8px;text-transform:uppercase;padding:6px 14px;border-radius:6px;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all .2s}
+  .nav-tab:hover{color:var(--text);background:var(--surface2)}
+  .nav-tab.active{background:var(--accent);color:#000}
+  .page{display:none;padding-top:72px;min-height:100vh;animation:fadeIn .3s ease}
+  .page.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .container{max-width:680px;margin:0 auto;padding:20px 16px 60px}
+  .page-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;letter-spacing:1px;text-transform:uppercase;line-height:1;margin-bottom:4px}
+  .page-subtitle{color:var(--text2);font-size:14px;margin-bottom:28px;font-weight:400}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px}
+  .card-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:14px}
+  input[type=text],input[type=password],select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:12px 14px;font-family:'Barlow',sans-serif;font-size:15px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+  input[type=text]:focus,input[type=password]:focus,select:focus{border-color:var(--accent)}
+  input::placeholder{color:var(--text3)}
+  .btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);border:none;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:8px}
+  .btn-primary{background:var(--accent);color:#000}
+  .btn-primary:hover:not(:disabled){background:var(--accent2);transform:translateY(-1px)}
+  .btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none}
+  .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+  .btn-secondary:hover{background:var(--surface3)}
+  .btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+  .btn-danger:hover{background:rgba(239,68,68,.25)}
+  .btn-success{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+  .btn-success:hover{background:rgba(34,197,94,.25)}
+  .btn-sm{padding:6px 12px;font-size:12px}
+  .btn-full{width:100%;justify-content:center}
+  .odds-table{width:100%;border-collapse:collapse}
+  .odds-table th{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+  .odds-table td{padding:10px 12px;font-size:14px;border-bottom:1px solid rgba(42,48,64,.5)}
+  .odds-table tr:last-child td{border-bottom:none}
+  .odds-table tr:hover td{background:rgba(255,255,255,.02)}
+  .driver-rank{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--text3);width:28px}
+  .driver-name{font-weight:500}
+  .odds-badge{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;padding:3px 10px;border-radius:6px;display:inline-block}
+  .odds-fav{background:rgba(34,197,94,.15);color:var(--green)}
+  .odds-mid{background:rgba(240,180,41,.12);color:var(--accent)}
+  .odds-long{background:rgba(239,68,68,.15);color:var(--red)}
+  .cat-badge{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:.8px;text-transform:uppercase;padding:2px 7px;border-radius:4px;display:inline-block;vertical-align:middle;margin-left:5px;white-space:nowrap}
+  .cat-fav{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+  .cat-possible{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.25)}
+  .cat-underdog{background:rgba(240,180,41,.12);color:var(--accent);border:1px solid rgba(240,180,41,.25)}
+  .cat-hailmary{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+  .rank-list{list-style:none}
+  .rank-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;cursor:grab;transition:all .15s;user-select:none;touch-action:none}
+  .rank-item:active{cursor:grabbing}
+  .rank-item.dragging{opacity:.5;background:var(--surface3);border-color:var(--accent)}
+  .rank-item.drag-over{border-color:var(--accent);background:rgba(240,180,41,.06);transform:scale(1.01)}
+  .rank-number{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;color:var(--accent);width:28px;text-align:center;flex-shrink:0}
+  .rank-driver{flex:1;font-weight:500;font-size:15px}
+  .drag-handle{color:var(--text3);font-size:16px;flex-shrink:0}
+  .event-section{margin-bottom:20px}
+  .event-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;letter-spacing:.5px;text-transform:uppercase;color:var(--text);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+  .event-counter{font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--surface2);color:var(--text2);letter-spacing:0}
+  .event-counter.complete{background:rgba(34,197,94,.15);color:var(--green)}
+  .driver-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .driver-bet-btn{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s;text-align:left}
+  .driver-bet-btn:hover{border-color:var(--accent);background:rgba(240,180,41,.05)}
+  .driver-bet-btn.selected{border-color:var(--accent);background:rgba(240,180,41,.1)}
+  .driver-bet-btn .dname{font-weight:600;font-size:13px;color:var(--text)}
+  .driver-bet-btn .dodds{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:14px;color:var(--accent)}
+  .driver-bet-btn.selected .dname{color:var(--accent)}
+  .check-icon{display:none;color:var(--green);font-size:14px}
+  .driver-bet-btn.selected .check-icon{display:inline}
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 24px;font-weight:500;font-size:14px;z-index:1000;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+  #toast.show{transform:translateX(-50%) translateY(0)}
+  #toast.success{border-color:var(--green);color:var(--green)}
+  #toast.error{border-color:var(--red);color:var(--red)}
+  .lock-banner{background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(239,68,68,.05));border:1px solid rgba(239,68,68,.3);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--red);font-weight:500}
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+  .stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center}
+  .stat-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;color:var(--accent);line-height:1}
+  .stat-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-top:4px;font-weight:600}
+  .bet-log-item{padding:12px 0;border-bottom:1px solid var(--border)}
+  .bet-log-item:last-child{border-bottom:none}
+  .bet-log-name{font-weight:700;font-size:15px;margin-bottom:4px}
+  .bet-log-detail{font-size:12px;color:var(--text2);line-height:1.6}
+  .bet-log-detail strong{color:var(--text)}
+  .driver-admin-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(42,48,64,.5)}
+  .driver-admin-row:last-child{border-bottom:none}
+  .driver-admin-row input{padding:7px 10px;font-size:14px}
+  .result-event{margin-bottom:16px}
+  .result-event-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text2);margin-bottom:8px}
+  .winner-card{background:linear-gradient(135deg,rgba(34,197,94,.08),rgba(34,197,94,.03));border:1px solid rgba(34,197,94,.25);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+  .winner-card .event-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:6px}
+  .winner-card .winning-driver{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:var(--text);margin-bottom:8px}
+  .winner-bettors{font-size:13px;color:var(--text2);line-height:1.7}
+  .winner-bettors .bettor-name{color:var(--accent);font-weight:600}
+  .admin-login{max-width:360px;margin:60px auto}
+  .admin-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px}
+  .admin-tab{flex:1;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:8px 6px;border-radius:6px;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all .2s;text-align:center}
+  .admin-tab.active{background:var(--surface3);color:var(--text)}
+  .admin-tab:hover:not(.active){color:var(--text)}
+  .admin-section{display:none}
+  .admin-section.active{display:block}
+  .inline-row{display:flex;gap:8px;align-items:center}
+  .inline-row input{flex:1}
+  .mt-16{margin-top:16px}
+  .mb-12{margin-bottom:12px}
+  @media(max-width:480px){#nav{height:auto;flex-direction:column;align-items:stretch;padding:8px 12px 6px;gap:6px}.nav-logo{font-size:14px}.nav-tabs{display:flex;justify-content:stretch;gap:4px}.nav-tab{flex:1;text-align:center;font-size:11px;padding:7px 4px;letter-spacing:.5px}.page{padding-top:100px}.driver-grid{grid-template-columns:1fr}.stat-num{font-size:26px}.page-title{font-size:28px}}
+  ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 </style>
 </head>
 <body>
-
-<!-- NAV -->
 <nav id="nav">
-  <div class="nav-logo">Kart<span>Bet</span> 🏁 <span id="sync-dot" title="Live sync"></span></div>
+  <div class="nav-logo">Dave-Bucks-<span>Bet</span> 🏁 <span id="sync-dot" title="Live sync"></span></div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showPage('page-rank')" id="tab-rank">Rankings</button>
     <button class="nav-tab" onclick="showPage('page-bet')" id="tab-bet">Place Bet</button>
     <button class="nav-tab" onclick="showPage('page-admin')" id="tab-admin">Admin</button>
   </div>
 </nav>
-
-<!-- TOAST -->
 <div id="toast"></div>
-
-<!-- ============================================================ -->
-<!-- PAGE 1: RANKINGS -->
-<!-- ============================================================ -->
 <div class="page active" id="page-rank">
   <div class="container">
     <div class="page-title">🏎️ Race Rankings</div>
     <div class="page-subtitle">Rank the drivers to set the odds — your picks shape the board.</div>
-
-    <div id="rank-locked-banner" class="lock-banner" style="display:none;">
-      🔒 Rankings are closed. Head to the <strong>Place Bet</strong> tab!
-    </div>
-
+    <div id="rank-locked-banner" class="lock-banner" style="display:none;">🔒 Rankings are closed. Head to the <strong>Place Bet</strong> tab!</div>
     <div id="rank-form-wrap">
       <div class="card">
-        <div class="card-title">Your Name</div>
+        <div class="card-title">Your Name <span style="color:var(--text3);font-weight:400;font-size:11px;letter-spacing:0;">(optional)</span></div>
         <input type="text" id="rank-name" placeholder="Enter your name..." maxlength="30" />
       </div>
-
       <div class="card">
         <div class="card-title">Drag to rank drivers — #1 is most likely to win</div>
         <ul class="rank-list" id="rank-list"></ul>
       </div>
-
-      <button class="btn btn-primary btn-full" id="rank-submit-btn" onclick="submitRanking()" disabled>
-        Submit Rankings
-      </button>
+      <button class="btn btn-primary btn-full" id="rank-submit-btn" onclick="submitRanking()">Submit Rankings</button>
     </div>
-
-    <!-- CURRENT ODDS PREVIEW -->
-    <div class="card mt-16" id="current-odds-card">
+    <div class="card mt-16">
       <div class="card-title">📊 Live Odds Board</div>
-      <table class="odds-table" id="odds-preview-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Driver</th>
-            <th>Drinks</th>
-          </tr>
-        </thead>
-        <tbody id="odds-preview-body"></tbody>
-      </table>
-      <div id="no-odds-msg" style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">
-        No rankings submitted yet. Be the first!
-      </div>
+      <table class="odds-table"><thead><tr><th>#</th><th>Driver</th><th>Drinks</th></tr></thead><tbody id="odds-preview-body"></tbody></table>
+      <div id="no-odds-msg" style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No rankings submitted yet. Be the first!</div>
     </div>
   </div>
 </div>
-
-<!-- ============================================================ -->
-<!-- PAGE 2: BET PLACEMENT -->
-<!-- ============================================================ -->
 <div class="page" id="page-bet">
   <div class="container">
     <div class="page-title">🎰 Place Your Bet</div>
     <div class="page-subtitle">Pick 3 drivers per event. Correct picks = drinks owed to you.</div>
-
-    <div id="bet-locked-banner" class="lock-banner" style="display:none;">
-      🔒 Betting is closed. Check the admin panel for results!
-    </div>
-
+    <div id="bet-locked-banner" class="lock-banner" style="display:none;">🔒 Betting is closed. Check the admin panel for results!</div>
     <div id="bet-form-wrap">
       <div class="card">
         <div class="card-title">Your Name</div>
         <input type="text" id="bet-name" placeholder="Enter your name..." maxlength="30" oninput="checkBetName()" />
-        <div id="bet-name-warning" style="color:var(--red);font-size:12px;margin-top:6px;display:none;">
-          ⚠️ A bet has already been placed under this name.
-        </div>
+        <div id="bet-name-warning" style="color:var(--red);font-size:12px;margin-top:6px;display:none;">⚠️ A bet has already been placed under this name.</div>
       </div>
-
       <div class="card">
         <div class="card-title">📊 Current Odds</div>
-        <table class="odds-table">
-          <thead><tr><th>#</th><th>Driver</th><th>Drinks</th></tr></thead>
-          <tbody id="bet-odds-body"></tbody>
-        </table>
+        <table class="odds-table"><thead><tr><th>#</th><th>Driver</th><th>Drinks</th></tr></thead><tbody id="bet-odds-body"></tbody></table>
       </div>
-
       <div id="bet-events-wrap"></div>
-
-      <button class="btn btn-primary btn-full" id="bet-submit-btn" onclick="submitBet()" disabled>
-        Lock In Bet 🔒
-      </button>
+      <button class="btn btn-primary btn-full" id="bet-submit-btn" onclick="submitBet()" disabled>Lock In Bet 🔒</button>
     </div>
   </div>
 </div>
-
-<!-- ============================================================ -->
-<!-- PAGE 3: ADMIN -->
-<!-- ============================================================ -->
 <div class="page" id="page-admin">
   <div class="container">
-
     <div id="admin-login-wrap" class="admin-login">
       <div class="page-title" style="text-align:center;margin-bottom:4px;">🔐 Admin</div>
       <div class="page-subtitle" style="text-align:center;margin-bottom:24px;">MC Dashboard — restricted access</div>
@@ -773,35 +183,23 @@
         <button class="btn btn-primary btn-full mt-16" onclick="adminLogin()">Enter Dashboard</button>
       </div>
     </div>
-
     <div id="admin-panel" style="display:none;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-        <div>
-          <div class="page-title">⚙️ MC Dashboard</div>
-          <div class="page-subtitle">Control the game from here.</div>
-        </div>
+        <div><div class="page-title">⚙️ MC Dashboard</div><div class="page-subtitle">Control the game from here.</div></div>
         <button class="btn btn-secondary btn-sm" onclick="adminLogout()">Logout</button>
       </div>
-
       <div class="stat-row" id="admin-stats"></div>
-
       <div class="admin-tabs">
-        <button class="admin-tab active" onclick="switchAdminTab('overview')">Overview</button>
-        <button class="admin-tab" onclick="switchAdminTab('drivers')">Drivers</button>
-        <button class="admin-tab" onclick="switchAdminTab('bets')">Bets</button>
-        <button class="admin-tab" onclick="switchAdminTab('results')">Results</button>
+        <button class="admin-tab active" onclick="switchAdminTab('overview',event)">Overview</button>
+        <button class="admin-tab" onclick="switchAdminTab('drivers',event)">Drivers</button>
+        <button class="admin-tab" onclick="switchAdminTab('bets',event)">Bets</button>
+        <button class="admin-tab" onclick="switchAdminTab('results',event)">Results</button>
       </div>
-
-      <!-- OVERVIEW -->
       <div class="admin-section active" id="admin-overview">
         <div class="card">
           <div class="card-title">Live Odds</div>
-          <table class="odds-table">
-            <thead><tr><th>#</th><th>Driver</th><th>Drinks</th><th>Override</th></tr></thead>
-            <tbody id="admin-odds-body"></tbody>
-          </table>
+          <table class="odds-table"><thead><tr><th>#</th><th>Driver</th><th>Drinks</th><th>Override</th></tr></thead><tbody id="admin-odds-body"></tbody></table>
         </div>
-
         <div class="card">
           <div class="card-title">Game Controls</div>
           <div style="display:flex;flex-direction:column;gap:10px;">
@@ -811,8 +209,6 @@
           </div>
         </div>
       </div>
-
-      <!-- DRIVERS -->
       <div class="admin-section" id="admin-drivers">
         <div class="card">
           <div class="card-title">Add Driver</div>
@@ -821,852 +217,74 @@
             <button class="btn btn-primary" onclick="addDriver()">Add</button>
           </div>
         </div>
-        <div class="card">
-          <div class="card-title">Driver Roster</div>
-          <div id="admin-driver-list"></div>
-        </div>
+        <div class="card"><div class="card-title">Driver Roster</div><div id="admin-driver-list"></div></div>
       </div>
-
-      <!-- BETS -->
       <div class="admin-section" id="admin-bets">
-        <div class="card">
-          <div class="card-title">All Submitted Bets</div>
-          <div id="admin-bet-log">
-            <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No bets placed yet.</div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">Ballots Submitted</div>
-          <div id="admin-ballot-log">
-            <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No ballots yet.</div>
-          </div>
-        </div>
+        <div class="card"><div class="card-title">All Submitted Bets</div><div id="admin-bet-log"><div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No bets placed yet.</div></div></div>
+        <div class="card"><div class="card-title">Ballots Submitted</div><div id="admin-ballot-log"><div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No ballots yet.</div></div></div>
       </div>
-
-      <!-- RESULTS -->
       <div class="admin-section" id="admin-results">
-        <div class="card">
-          <div class="card-title">Enter Race Results</div>
-          <div id="results-entry-wrap"></div>
-          <button class="btn btn-primary btn-full mt-16" onclick="submitResults()">Calculate Winners 🏆</button>
-        </div>
+        <div class="card"><div class="card-title">Enter Race Results</div><div id="results-entry-wrap"></div><button class="btn btn-primary btn-full mt-16" onclick="submitResults()">Calculate Winners 🏆</button></div>
         <div id="results-display-wrap"></div>
       </div>
-
     </div>
   </div>
 </div>
-
 <script>
-// ============================================================
-// GOOGLE SHEETS SYNC
-// ============================================================
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyeTziXHh4vgerEDD2Usz-XpOraPQSBCYjafbEXuZKOPtF-XWw-urCbpbeXt5TUtiEZ/exec';
-
-// ============================================================
-// STATE
-// ============================================================
-const ADMIN_PASSWORD = 'kartbet2025';
-const EVENTS = ['Race 1', 'Race 2', 'Race 3', 'Overall Winner'];
-const DEFAULT_DRIVERS = ['David','Eamon','Jake','Conor','Paul','Will','Matt','Blake','Mike','Paul K','Stephen','Tom','Marcus','Scott','James','Trent','Tony','Sam','Terry','Jacob','Harry','Brandon'];
-const NICKNAMES = {
-  'David':'Deadweight Dave','Eamon':'E-Brake Eamon','Jake':'Jackknife Jake',
-  'Conor':'Cone-Collector Conor','Paul':'Pit-Lane Paul','Will':'Wall-Rider Will',
-  'Matt':'Mid-Pack Matt','Blake':'Brake-Check Blake','Mike':'Misfire Mike',
-  'Paul K':'Penalty-Point Paul Kelly','Stephen':'Spin-Out Stephen','Tom':'Torqueless-Tom',
-  'Marcus':'Marshalled-Off Marcus','Scott':'Safety-Car Scotty','James':'Jump-Start Jimmy',
-  'Trent':'Tractionless Trent','Tony':'Two-Lap Tony','Sam':'Slow-Line Sam',
-  'Terry':'Tyre-Barrier Terry','Jacob':'Jittery Jacob','Harry':'Hell Driver Harry',
-  'Brandon':'Brake-Pad Brandon'
-};
-
-let state = {
-  drivers: [...DEFAULT_DRIVERS],
-  ballots: [],
-  bets: [],
-  oddsOverrides: {},
-  rankingsLocked: false,
-  bettingLocked: false,
-  results: {},
-  adminLoggedIn: false,
-};
-
-let isSaving = false;
-
-
-
-function applyData(data) {
-  if (!data) return;
-  const wasAdmin = state.adminLoggedIn;
-  state.drivers = data.drivers || [...DEFAULT_DRIVERS];
-  state.ballots = data.ballots || [];
-  state.bets = data.bets || [];
-  state.oddsOverrides = data.oddsOverrides || {};
-  state.rankingsLocked = data.rankingsLocked || false;
-  state.bettingLocked = data.bettingLocked || false;
-  state.results = data.results || {};
-  state.adminLoggedIn = wasAdmin;
-  renderRankPage();
-  renderBetPage();
-  if (state.adminLoggedIn) renderAdminPanel();
-  showSyncPulse();
-}
-
-// POST save — no-cors is fine for writes
-function saveToSheet() {
-  if (isSaving) return;
-  isSaving = true;
-  const payload = {
-    drivers: state.drivers,
-    ballots: state.ballots,
-    bets: state.bets,
-    oddsOverrides: state.oddsOverrides,
-    rankingsLocked: state.rankingsLocked,
-    bettingLocked: state.bettingLocked,
-    results: state.results,
-  };
-  fetch(SHEET_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(payload)
-  }).catch(e => console.error('Save error:', e))
-    .finally(() => { isSaving = false; });
-}
-
-// Load from sheet — tries plain fetch first, falls back to JSONP
-function loadFromSheet() {
-  fetch(SHEET_URL + '?t=' + Date.now(), { redirect: 'follow' })
-    .then(r => r.text())
-    .then(text => {
-      console.log('Sheet response:', text.substring(0, 120));
-      if (!text || text.trim() === '' || text.trim() === '{}') return;
-      const data = JSON.parse(text);
-      applyData(data);
-    })
-    .catch(e => {
-      console.warn('Fetch failed (' + e.message + '), trying JSONP...');
-      loadViaJsonp();
-    });
-}
-
-function loadViaJsonp() {
-  const cbName = 'kb_cb_' + Date.now();
-  const script = document.createElement('script');
-  script.src = SHEET_URL + '?callback=' + cbName + '&t=' + Date.now();
-  console.log('Trying JSONP:', script.src);
-  script.onerror = () => {
-    console.error('JSONP failed. Ensure Apps Script: Execute as Me, Access: Anyone, redeployed as new version.');
-    script.remove();
-    delete window[cbName];
-  };
-  window[cbName] = (data) => {
-    delete window[cbName];
-    script.remove();
-    applyData(data);
-  };
-  document.head.appendChild(script);
-}
-
-// POST save — no-cors is fine for writes, we just can't read the response
-
-
-function showSyncPulse() {
-  const dot = document.getElementById('sync-dot');
-  if (!dot) return;
-  dot.classList.add('synced');
-  setTimeout(() => dot.classList.remove('synced'), 1500);
-}
-
-// Poll every 10 seconds
-setInterval(loadFromSheet, 10000);
-
-// ============================================================
-// ODDS CALCULATION
-// ============================================================
-function calcOdds() {
-  const n = state.drivers.length;
-  if (!n) return {};
-
-  // Borda count
-  const scores = {};
-  state.drivers.forEach(d => scores[d] = 0);
-
-  state.ballots.forEach(ballot => {
-    ballot.ranking.forEach((driver, idx) => {
-      if (scores[driver] !== undefined) {
-        scores[driver] += (n - idx);
-      }
-    });
-  });
-
-  const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
-
-  if (totalScore === 0) {
-    // No ballots: equal odds
-    const eq = {};
-    state.drivers.forEach(d => eq[d] = { drinks: 2.0, raw: 1, prob: 1/n });
-    return eq;
-  }
-
-  // Raw odds
-  const rawOdds = {};
-  state.drivers.forEach(d => {
-    const prob = scores[d] / totalScore;
-    rawOdds[d] = prob > 0 ? 1 / prob : 999;
-  });
-
-  const vals = Object.values(rawOdds);
-  const minRaw = Math.min(...vals);
-  const maxRaw = Math.max(...vals);
-
-  const DRINK_MIN = 0.25;
-  const DRINK_MAX = 5.0;
-
-  const result = {};
-  state.drivers.forEach(d => {
-    let drinks;
-    if (state.oddsOverrides[d] !== undefined) {
-      drinks = state.oddsOverrides[d];
-    } else if (maxRaw === minRaw) {
-      drinks = (DRINK_MIN + DRINK_MAX) / 2;
-    } else {
-      const t = (rawOdds[d] - minRaw) / (maxRaw - minRaw);
-      drinks = DRINK_MIN + t * (DRINK_MAX - DRINK_MIN);
-    }
-    // Round to nearest 0.25
-    drinks = Math.round(drinks * 4) / 4;
-    result[d] = {
-      drinks,
-      prob: scores[d] / totalScore,
-      raw: rawOdds[d]
-    };
-  });
-
-  return result;
-}
-
-function getSortedOdds() {
-  const odds = calcOdds();
-  return state.drivers
-    .map(d => ({ name: d, ...odds[d] }))
-    .sort((a, b) => a.drinks - b.drinks);
-}
-
-function oddsClass(drinks) {
-  if (drinks <= 1.0) return 'odds-fav';
-  if (drinks >= 3.5) return 'odds-long';
-  return 'odds-mid';
-}
-
-// Category based on rank position: Top 3 = Favourite, Next 6 = Possible, Next 6 = Underdog, Bottom 4 = Hail Mary
-function getCategory(rank) {
-  if (rank <= 3) return { label: 'Favourite', cls: 'cat-fav' };
-  if (rank <= 9) return { label: 'Possible', cls: 'cat-possible' };
-  if (rank <= 15) return { label: 'Underdog', cls: 'cat-underdog' };
-  return { label: 'Hail Mary', cls: 'cat-hailmary' };
-}
-
-function formatDrinks(d) {
-  return d.toFixed(2);
-}
-
-// ============================================================
-// NAV
-// ============================================================
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  const tabMap = { 'page-rank': 'tab-rank', 'page-bet': 'tab-bet', 'page-admin': 'tab-admin' };
-  document.getElementById(tabMap[id]).classList.add('active');
-
-  if (id === 'page-bet') renderBetPage();
-  if (id === 'page-rank') renderRankPage();
-  if (id === 'page-admin' && state.adminLoggedIn) renderAdminPanel();
-}
-
-// ============================================================
-// PAGE 1: RANKINGS
-// ============================================================
-let dragSrc = null;
-
-function renderRankPage() {
-  const banner = document.getElementById('rank-locked-banner');
-  const formWrap = document.getElementById('rank-form-wrap');
-  banner.style.display = state.rankingsLocked ? 'flex' : 'none';
-  formWrap.style.display = state.rankingsLocked ? 'none' : 'block';
-  renderRankList();
-  renderOddsPreview();
-}
-
-function renderRankList() {
-  const list = document.getElementById('rank-list');
-  list.innerHTML = '';
-  // Default order = drivers list
-  const currentOrder = list._order || [...state.drivers];
-  // Sync if drivers changed
-  const validOrder = currentOrder.filter(d => state.drivers.includes(d));
-  state.drivers.forEach(d => { if (!validOrder.includes(d)) validOrder.push(d); });
-  list._order = validOrder;
-
-  validOrder.forEach((driver, idx) => {
-    const li = document.createElement('li');
-    li.className = 'rank-item';
-    li.draggable = true;
-    li.dataset.driver = driver;
-    li.innerHTML = `
-      <span class="rank-number">${idx + 1}</span>
-      <span class="rank-driver">${driver}</span>
-      <span class="drag-handle">⠿</span>
-    `;
-    // Desktop drag
-    li.addEventListener('dragstart', e => { dragSrc = li; li.classList.add('dragging'); });
-    li.addEventListener('dragend', e => { li.classList.remove('dragging'); updateRankNumbers(); validateRankForm(); });
-    li.addEventListener('dragover', e => { e.preventDefault(); li.classList.add('drag-over'); });
-    li.addEventListener('dragleave', () => li.classList.remove('drag-over'));
-    li.addEventListener('drop', e => {
-      e.preventDefault();
-      li.classList.remove('drag-over');
-      if (dragSrc && dragSrc !== li) {
-        const items = [...list.querySelectorAll('.rank-item')];
-        const srcIdx = items.indexOf(dragSrc);
-        const tgtIdx = items.indexOf(li);
-        if (srcIdx < tgtIdx) list.insertBefore(dragSrc, li.nextSibling);
-        else list.insertBefore(dragSrc, li);
-        updateRankNumbers();
-        syncListOrder();
-      }
-    });
-    // Touch drag
-    setupTouchDrag(li, list);
-    list.appendChild(li);
-  });
-  validateRankForm();
-}
-
-function setupTouchDrag(item, list) {
-  let startY, startX, clone, origRect;
-  item.addEventListener('touchstart', e => {
-    const touch = e.touches[0];
-    startY = touch.clientY; startX = touch.clientX;
-    origRect = item.getBoundingClientRect();
-    clone = item.cloneNode(true);
-    clone.style.cssText = `position:fixed;z-index:9000;width:${origRect.width}px;opacity:0.85;pointer-events:none;left:${origRect.left}px;top:${origRect.top}px;background:var(--surface3);border-color:var(--accent);border-radius:10px;`;
-    document.body.appendChild(clone);
-    item.style.opacity = '0.3';
-  }, { passive: true });
-
-  item.addEventListener('touchmove', e => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const dy = touch.clientY - startY;
-    const dx = touch.clientX - startX;
-    clone.style.top = (origRect.top + dy) + 'px';
-    clone.style.left = (origRect.left + dx) + 'px';
-    // Find target
-    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    const target = el && el.closest('.rank-item');
-    list.querySelectorAll('.rank-item').forEach(i => i.classList.remove('drag-over'));
-    if (target && target !== item) target.classList.add('drag-over');
-  }, { passive: false });
-
-  item.addEventListener('touchend', e => {
-    if (clone) { clone.remove(); clone = null; }
-    item.style.opacity = '';
-    const touch = e.changedTouches[0];
-    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    const target = el && el.closest('.rank-item');
-    list.querySelectorAll('.rank-item').forEach(i => i.classList.remove('drag-over'));
-    if (target && target !== item) {
-      const items = [...list.querySelectorAll('.rank-item')];
-      const srcIdx = items.indexOf(item);
-      const tgtIdx = items.indexOf(target);
-      if (srcIdx < tgtIdx) list.insertBefore(item, target.nextSibling);
-      else list.insertBefore(item, target);
-      updateRankNumbers();
-      syncListOrder();
-    }
-    validateRankForm();
-  });
-}
-
-function updateRankNumbers() {
-  const items = document.querySelectorAll('#rank-list .rank-item');
-  items.forEach((item, idx) => {
-    item.querySelector('.rank-number').textContent = idx + 1;
-  });
-}
-
-function syncListOrder() {
-  const list = document.getElementById('rank-list');
-  list._order = [...list.querySelectorAll('.rank-item')].map(li => li.dataset.driver);
-}
-
-function getRankingFromList() {
-  return [...document.querySelectorAll('#rank-list .rank-item')].map(li => li.dataset.driver);
-}
-
-function validateRankForm() {
-  const name = document.getElementById('rank-name').value.trim();
-  const ranking = getRankingFromList();
-  const btn = document.getElementById('rank-submit-btn');
-  btn.disabled = !name || ranking.length !== state.drivers.length;
-}
-
-// ============================================================
-// INIT
-// ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('rank-name').addEventListener('input', validateRankForm);
-  renderRankPage();
-  renderBetPage();
-  loadFromSheet(); // initial load from Google Sheets
-});
-
-function submitRanking() {
-  if (state.rankingsLocked) { showToast('Rankings are closed!', 'error'); return; }
-  const name = document.getElementById('rank-name').value.trim();
-  if (!name) return;
-  const ranking = getRankingFromList();
-
-  // Check if same name already submitted — allow multiple per spec, just record
-  state.ballots.push({ name, ranking });
-  saveToSheet();
-  document.getElementById('rank-name').value = '';
-  renderOddsPreview();
-  if (state.adminLoggedIn) renderAdminPanel();
-  showToast(`Rankings submitted by ${name}! ✅`, 'success');
-  // Reset list order randomly for next person
-  const list = document.getElementById('rank-list');
-  list._order = [...state.drivers].sort(() => Math.random() - 0.5);
-  renderRankList();
-}
-
-function renderOddsPreview() {
-  const sorted = getSortedOdds();
-  const body = document.getElementById('odds-preview-body');
-  const noMsg = document.getElementById('no-odds-msg');
-
-  if (state.ballots.length === 0) {
-    body.innerHTML = '';
-    noMsg.style.display = 'block';
-    return;
-  }
-  noMsg.style.display = 'none';
-  body.innerHTML = sorted.map((d, i) => {
-    const cat = getCategory(i + 1);
-    return `
-    <tr>
-      <td class="driver-rank">${i + 1}</td>
-      <td class="driver-name">${NICKNAMES[d.name] || d.name}</td>
-      <td>
-        <span class="odds-badge ${oddsClass(d.drinks)}">${formatDrinks(d.drinks)} 🍺</span>
-        <span class="cat-badge ${cat.cls}">${cat.label}</span>
-      </td>
-    </tr>
-  `}).join('');
-}
-
-// ============================================================
-// PAGE 2: BET PLACEMENT
-// ============================================================
-let betSelections = {}; // {event: Set of selected driver names}
-
-function renderBetPage() {
-  EVENTS.forEach(e => { if (!betSelections[e]) betSelections[e] = new Set(); });
-
-  // Locked banner
-  const banner = document.getElementById('bet-locked-banner');
-  const formWrap = document.getElementById('bet-form-wrap');
-  banner.style.display = state.bettingLocked ? 'flex' : 'none';
-  formWrap.style.display = state.bettingLocked ? 'none' : 'block';
-
-  // Odds table
-  const sorted = getSortedOdds();
-  document.getElementById('bet-odds-body').innerHTML = sorted.map((d, i) => {
-    const cat = getCategory(i + 1);
-    return `
-    <tr>
-      <td class="driver-rank">${i + 1}</td>
-      <td class="driver-name">${NICKNAMES[d.name] || d.name}</td>
-      <td>
-        <span class="odds-badge ${oddsClass(d.drinks)}">${formatDrinks(d.drinks)} 🍺</span>
-        <span class="cat-badge ${cat.cls}">${cat.label}</span>
-      </td>
-    </tr>
-  `}).join('');
-
-  // Events
-  const oddsMap = {};
-  sorted.forEach(d => oddsMap[d.name] = d.drinks);
-  const wrap = document.getElementById('bet-events-wrap');
-  wrap.innerHTML = EVENTS.map(event => `
-    <div class="card event-section">
-      <div class="event-title">
-        ${event}
-        <span class="event-counter${(betSelections[event] && betSelections[event].size === 3) ? ' complete' : ''}" id="counter-${event.replace(/ /g,'_')}">
-          ${betSelections[event] ? betSelections[event].size : 0}/3 selected
-        </span>
-      </div>
-      <div class="driver-grid">
-        ${sorted.map(d => `
-          <button class="driver-bet-btn${betSelections[event] && betSelections[event].has(d.name) ? ' selected' : ''}"
-            onclick="toggleBetDriver('${event}','${d.name}')" id="btn-${event.replace(/ /g,'_')}-${d.name.replace(/ /g,'_')}">
-            <span>
-              <span class="check-icon">✓ </span>
-              <span class="dname">${NICKNAMES[d.name] || d.name}</span>
-            </span>
-            <span class="dodds">${formatDrinks(oddsMap[d.name] || 2)} 🍺</span>
-          </button>
-        `).join('')}
-      </div>
-    </div>
-  `).join('');
-
-  validateBetForm();
-}
-
-function toggleBetDriver(event, driver) {
-  if (!betSelections[event]) betSelections[event] = new Set();
-  const sel = betSelections[event];
-  if (sel.has(driver)) {
-    sel.delete(driver);
-  } else {
-    if (sel.size >= 3) { showToast('Max 3 drivers per event', 'error'); return; }
-    sel.add(driver);
-  }
-  // Update counter
-  const key = event.replace(/ /g,'_');
-  const counter = document.getElementById(`counter-${key}`);
-  if (counter) {
-    counter.textContent = `${sel.size}/3 selected`;
-    counter.className = 'event-counter' + (sel.size === 3 ? ' complete' : '');
-  }
-  // Update button
-  const btn = document.getElementById(`btn-${key}-${driver.replace(/ /g,'_')}`);
-  if (btn) btn.className = 'driver-bet-btn' + (sel.has(driver) ? ' selected' : '');
-  validateBetForm();
-}
-
-function checkBetName() {
-  const name = document.getElementById('bet-name').value.trim().toLowerCase();
-  const exists = state.bets.some(b => b.name.toLowerCase() === name);
-  document.getElementById('bet-name-warning').style.display = exists ? 'block' : 'none';
-  validateBetForm();
-}
-
-function validateBetForm() {
-  const name = document.getElementById('bet-name').value.trim();
-  const exists = name && state.bets.some(b => b.name.toLowerCase() === name.toLowerCase());
-  const allSelected = EVENTS.every(e => betSelections[e] && betSelections[e].size === 3);
-  document.getElementById('bet-submit-btn').disabled = !name || exists || !allSelected;
-}
-
-function submitBet() {
-  if (state.bettingLocked) { showToast('Betting is closed!', 'error'); return; }
-  const name = document.getElementById('bet-name').value.trim();
-  if (!name) return;
-  if (state.bets.some(b => b.name.toLowerCase() === name.toLowerCase())) {
-    showToast('Bet already placed for this name!', 'error'); return;
-  }
-  const picks = {};
-  EVENTS.forEach(e => { picks[e] = [...betSelections[e]]; });
-  state.bets.push({ name, picks, timestamp: new Date().toLocaleTimeString() });
-  saveToSheet();
-
-  // Reset
-  EVENTS.forEach(e => betSelections[e] = new Set());
-  document.getElementById('bet-name').value = '';
-  document.getElementById('bet-name-warning').style.display = 'none';
-
-  showToast(`Bet locked in for ${name}! 🎰`, 'success');
-  renderBetPage();
-  if (state.adminLoggedIn) renderAdminPanel();
-}
-
-// ============================================================
-// PAGE 3: ADMIN
-// ============================================================
-function adminLogin() {
-  const pw = document.getElementById('admin-pw').value;
-  if (pw === ADMIN_PASSWORD) {
-    state.adminLoggedIn = true;
-    document.getElementById('admin-login-wrap').style.display = 'none';
-    document.getElementById('admin-panel').style.display = 'block';
-    renderAdminPanel();
-  } else {
-    document.getElementById('admin-pw-err').style.display = 'block';
-  }
-}
-
-function adminLogout() {
-  state.adminLoggedIn = false;
-  document.getElementById('admin-login-wrap').style.display = 'block';
-  document.getElementById('admin-panel').style.display = 'none';
-  document.getElementById('admin-pw').value = '';
-  document.getElementById('admin-pw-err').style.display = 'none';
-}
-
-let currentAdminTab = 'overview';
-function switchAdminTab(tab) {
-  currentAdminTab = tab;
-  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('admin-' + tab).classList.add('active');
-  renderAdminPanel();
-}
-
-function renderAdminPanel() {
-  if (!state.adminLoggedIn) return;
-  renderAdminStats();
-  renderAdminOdds();
-  renderAdminDriverList();
-  renderAdminBets();
-  renderResultsEntry();
-
-  // Lock button state
-  const btn = document.getElementById('lock-rankings-btn');
-  if (btn) {
-    btn.textContent = state.rankingsLocked ? '🔓 Reopen Rankings' : '🔒 Close Rankings';
-    btn.className = state.rankingsLocked ? 'btn btn-success btn-full' : 'btn btn-danger btn-full';
-  }
-}
-
-function renderAdminStats() {
-  document.getElementById('admin-stats').innerHTML = `
-    <div class="stat-box"><div class="stat-num">${state.ballots.length}</div><div class="stat-label">Ballots</div></div>
-    <div class="stat-box"><div class="stat-num">${state.bets.length}</div><div class="stat-label">Bets</div></div>
-    <div class="stat-box"><div class="stat-num">${state.drivers.length}</div><div class="stat-label">Drivers</div></div>
-  `;
-}
-
-function renderAdminOdds() {
-  const sorted = getSortedOdds();
-  document.getElementById('admin-odds-body').innerHTML = sorted.map((d, i) => {
-    const cat = getCategory(i + 1);
-    return `
-    <tr>
-      <td class="driver-rank">${i + 1}</td>
-      <td class="driver-name">${d.name}</td>
-      <td>
-        <span class="odds-badge ${oddsClass(d.drinks)}">${formatDrinks(d.drinks)} 🍺</span>
-        <span class="cat-badge ${cat.cls}">${cat.label}</span>
-      </td>
-      <td>
-        <input type="number" min="0.25" max="5" step="0.25"
-          style="width:80px;padding:5px 8px;font-size:13px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text)"
-          placeholder="–"
-          value="${state.oddsOverrides[d.name] !== undefined ? state.oddsOverrides[d.name] : ''}"
-          onchange="setOddsOverride('${d.name}', this.value)"
-        />
-      </td>
-    </tr>
-  `}).join('');
-}
-
-function setOddsOverride(driver, val) {
-  if (val === '' || val === null) {
-    delete state.oddsOverrides[driver];
-  } else {
-    const v = parseFloat(val);
-    if (!isNaN(v)) state.oddsOverrides[driver] = Math.round(v * 4) / 4;
-  }
-  saveToSheet();
-  renderAdminOdds();
-  renderOddsPreview();
-}
-
-function renderAdminDriverList() {
-  const wrap = document.getElementById('admin-driver-list');
-  if (!wrap) return;
-  wrap.innerHTML = state.drivers.map((d, i) => `
-    <div class="driver-admin-row">
-      <input type="text" value="${d}" id="driver-edit-${i}" style="flex:1" />
-      <button class="btn btn-primary btn-sm" onclick="saveDriverEdit(${i})">Save</button>
-      <button class="btn btn-danger btn-sm" onclick="removeDriver(${i})">✕</button>
-    </div>
-  `).join('');
-}
-
-function saveDriverEdit(idx) {
-  const val = document.getElementById(`driver-edit-${idx}`).value.trim();
-  if (!val) return;
-  const old = state.drivers[idx];
-  state.drivers[idx] = val;
-  // Update ballots/bets references
-  state.ballots.forEach(b => {
-    const ri = b.ranking.indexOf(old);
-    if (ri !== -1) b.ranking[ri] = val;
-  });
-  state.bets.forEach(b => {
-    EVENTS.forEach(e => {
-      const pi = b.picks[e].indexOf(old);
-      if (pi !== -1) b.picks[e][pi] = val;
-    });
-  });
-  if (state.oddsOverrides[old]) { state.oddsOverrides[val] = state.oddsOverrides[old]; delete state.oddsOverrides[old]; }
-  saveToSheet();
-  renderAdminPanel();
-  renderRankPage();
-  showToast(`Driver renamed to ${val}`, 'success');
-}
-
-function removeDriver(idx) {
-  const name = state.drivers[idx];
-  state.drivers.splice(idx, 1);
-  delete state.oddsOverrides[name];
-  saveToSheet();
-  renderAdminPanel();
-  renderRankPage();
-  showToast(`Removed ${name}`, 'success');
-}
-
-function addDriver() {
-  const input = document.getElementById('new-driver-input');
-  const name = input.value.trim();
-  if (!name) return;
-  if (state.drivers.includes(name)) { showToast('Driver already exists', 'error'); return; }
-  state.drivers.push(name);
-  input.value = '';
-  saveToSheet();
-  renderAdminPanel();
-  renderRankPage();
-  showToast(`Added ${name}`, 'success');
-}
-
-function renderAdminBets() {
-  const betLog = document.getElementById('admin-bet-log');
-  const ballotLog = document.getElementById('admin-ballot-log');
-  if (!betLog || !ballotLog) return;
-
-  if (state.bets.length === 0) {
-    betLog.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No bets placed yet.</div>';
-  } else {
-    betLog.innerHTML = state.bets.map(b => `
-      <div class="bet-log-item">
-        <div class="bet-log-name">${b.name} <span style="color:var(--text3);font-size:11px;font-weight:400">@ ${b.timestamp}</span></div>
-        <div class="bet-log-detail">
-          ${EVENTS.map(e => `<strong>${e}:</strong> ${b.picks[e].join(', ')}`).join(' &nbsp;|&nbsp; ')}
-        </div>
-      </div>
-    `).join('');
-  }
-
-  if (state.ballots.length === 0) {
-    ballotLog.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No ballots yet.</div>';
-  } else {
-    ballotLog.innerHTML = state.ballots.map(b => `
-      <div class="bet-log-item">
-        <div class="bet-log-name">${b.name}</div>
-        <div class="bet-log-detail">Ranked: ${b.ranking.join(' → ')}</div>
-      </div>
-    `).join('');
-  }
-}
-
-function toggleLockRankings() {
-  state.rankingsLocked = !state.rankingsLocked;
-  saveToSheet();
-  renderAdminPanel();
-  renderRankPage();
-  showToast(state.rankingsLocked ? '🔒 Rankings closed!' : '🔓 Rankings reopened!', 'success');
-}
-
-function resetBallots() {
-  if (!confirm('Reset all ballots? This will recalculate odds.')) return;
-  state.ballots = [];
-  state.oddsOverrides = {};
-  saveToSheet();
-  renderAdminPanel();
-  renderRankPage();
-  showToast('Ballots reset ✓', 'success');
-}
-
-function resetBets() {
-  if (!confirm('Reset all bets?')) return;
-  state.bets = [];
-  saveToSheet();
-  renderAdminPanel();
-  showToast('Bets reset ✓', 'success');
-}
-
-// ============================================================
-// RESULTS
-// ============================================================
-function renderResultsEntry() {
-  const wrap = document.getElementById('results-entry-wrap');
-  if (!wrap) return;
-  wrap.innerHTML = EVENTS.map(event => `
-    <div class="result-event">
-      <div class="result-event-title">${event}</div>
-      <select id="result-select-${event.replace(/ /g,'_')}">
-        <option value="">— Select winner —</option>
-        ${state.drivers.map(d => `<option value="${d}" ${state.results[event] === d ? 'selected' : ''}>${d}</option>`).join('')}
-      </select>
-    </div>
-  `).join('');
-}
-
-function submitResults() {
-  EVENTS.forEach(event => {
-    const sel = document.getElementById(`result-select-${event.replace(/ /g,'_')}`);
-    if (sel && sel.value) state.results[event] = sel.value;
-  });
-  saveToSheet();
-
-  // Calculate winners & drinks
-  const resultsWrap = document.getElementById('results-display-wrap');
-  const odds = calcOdds();
-
-  const html = EVENTS.map(event => {
-    const winner = state.results[event];
-    if (!winner) return '';
-
-    const winnerOdds = odds[winner] ? odds[winner].drinks : 2.0;
-
-    // Find bettors who picked this driver for this event
-    const bettors = state.bets.filter(b => b.picks[event] && b.picks[event].includes(winner));
-
-    return `
-      <div class="winner-card">
-        <div class="event-label">🏆 ${event}</div>
-        <div class="winning-driver">${winner}</div>
-        <div style="margin-bottom:8px;">
-          <span class="odds-badge ${oddsClass(winnerOdds)}">${formatDrinks(winnerOdds)} 🍺</span>
-        </div>
-        ${bettors.length > 0
-          ? `<div class="winner-bettors">
-              <strong style="color:var(--text2);font-size:11px;letter-spacing:1px;text-transform:uppercase;">Winners 🎉</strong><br/>
-              ${bettors.map(b => `<span class="bettor-name">${b.name}</span> — earns <strong style="color:var(--green)">${formatDrinks(winnerOdds)} 🍺</strong>`).join('<br/>')}
-            </div>`
-          : `<div style="color:var(--text3);font-size:13px;">No one picked ${winner} for this event.</div>`
-        }
-      </div>
-    `;
-  }).join('');
-
-  resultsWrap.innerHTML = html || '<div style="color:var(--text3);font-size:13px;">No results entered yet.</div>';
-  showToast('Results calculated! 🏆', 'success');
-}
-
-// ============================================================
-// TOAST
-// ============================================================
-let toastTimeout;
-function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `show ${type}`;
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => { t.className = ''; }, 3000);
-}
-
-// functions are globally accessible in standard script tag
-
-// end of script
-
+const SHEET_URL='https://script.google.com/macros/s/AKfycbyeTziXHh4vgerEDD2Usz-XpOraPQSBCYjafbEXuZKOPtF-XWw-urCbpbeXt5TUtiEZ/exec';
+const ADMIN_PASSWORD='kartbet2025';
+const EVENTS=['Race 1','Race 2','Race 3','Overall Winner'];
+const DEFAULT_DRIVERS=['David','Eamon','Jake','Conor','Paul','Will','Matt','Blake','Mike','Paul K','Stephen','Tom','Marcus','Scott','James','Trent','Tony','Sam','Terry','Jacob','Harry','Brandon'];
+const NICKNAMES={'David':'Deadweight Dave','Eamon':'E-Brake Eamon','Jake':'Jackknife Jake','Conor':'Cone-Collector Conor','Paul':'Pit-Lane Paul','Will':'Wall-Rider Will','Matt':'Mid-Pack Matt','Blake':'Brake-Check Blake','Mike':'Misfire Mike','Paul K':'Penalty-Point Paul Kelly','Stephen':'Spin-Out Stephen','Tom':'Torqueless-Tom','Marcus':'Marshalled-Off Marcus','Scott':'Safety-Car Scotty','James':'Jump-Start Jimmy','Trent':'Tractionless Trent','Tony':'Two-Lap Tony','Sam':'Slow-Line Sam','Terry':'Tyre-Barrier Terry','Jacob':'Jittery Jacob','Harry':'Hell Driver Harry','Brandon':'Brake-Pad Brandon'};
+let state={drivers:[...DEFAULT_DRIVERS],ballots:[],bets:[],oddsOverrides:{},rankingsLocked:false,bettingLocked:false,results:{},adminLoggedIn:false};
+let isSaving=false;
+function applyData(d){if(!d)return;const wa=state.adminLoggedIn;state.drivers=d.drivers||[...DEFAULT_DRIVERS];state.ballots=d.ballots||[];state.bets=d.bets||[];state.oddsOverrides=d.oddsOverrides||{};state.rankingsLocked=d.rankingsLocked||false;state.bettingLocked=d.bettingLocked||false;state.results=d.results||{};state.adminLoggedIn=wa;renderRankPage();renderBetPage();if(state.adminLoggedIn)renderAdminPanel();showSyncPulse();}
+function saveToSheet(){if(isSaving)return;isSaving=true;fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({drivers:state.drivers,ballots:state.ballots,bets:state.bets,oddsOverrides:state.oddsOverrides,rankingsLocked:state.rankingsLocked,bettingLocked:state.bettingLocked,results:state.results})}).catch(e=>console.error('Save error:',e)).finally(()=>{isSaving=false;});}
+function loadFromSheet(){fetch(SHEET_URL+'?t='+Date.now(),{redirect:'follow'}).then(r=>r.text()).then(text=>{if(!text||text.trim()===''||text.trim()==='{}')return;applyData(JSON.parse(text));}).catch(()=>loadViaJsonp());}
+function loadViaJsonp(){const cb='kb_cb_'+Date.now();const s=document.createElement('script');s.src=SHEET_URL+'?callback='+cb+'&t='+Date.now();s.onerror=()=>{s.remove();delete window[cb];};window[cb]=(d)=>{delete window[cb];s.remove();applyData(d);};document.head.appendChild(s);}
+function showSyncPulse(){const d=document.getElementById('sync-dot');if(!d)return;d.classList.add('synced');setTimeout(()=>d.classList.remove('synced'),1500);}
+setInterval(loadFromSheet,10000);
+function calcOdds(){const n=state.drivers.length;if(!n)return{};const sc={};state.drivers.forEach(d=>sc[d]=0);state.ballots.forEach(b=>b.ranking.forEach((d,i)=>{if(sc[d]!==undefined)sc[d]+=(n-i)}));const tot=Object.values(sc).reduce((a,b)=>a+b,0);if(tot===0){const eq={};state.drivers.forEach(d=>eq[d]={drinks:2.0,raw:1,prob:1/n});return eq;}const raw={};state.drivers.forEach(d=>{const p=sc[d]/tot;raw[d]=p>0?1/p:999});const vals=Object.values(raw),mn=Math.min(...vals),mx=Math.max(...vals);const res={};state.drivers.forEach(d=>{let dr;if(state.oddsOverrides[d]!==undefined)dr=state.oddsOverrides[d];else if(mx===mn)dr=2.625;else{const t=(raw[d]-mn)/(mx-mn);dr=0.25+t*4.75;}dr=Math.round(dr*4)/4;res[d]={drinks:dr,prob:sc[d]/tot,raw:raw[d]}});return res;}
+function getSortedOdds(){const o=calcOdds();return state.drivers.map(d=>({name:d,...o[d]})).sort((a,b)=>a.drinks-b.drinks);}
+function oddsClass(d){return d<=1.0?'odds-fav':d>=3.5?'odds-long':'odds-mid';}
+function getCategory(r){if(r<=3)return{label:'Favourite',cls:'cat-fav'};if(r<=9)return{label:'Possible',cls:'cat-possible'};if(r<=15)return{label:'Underdog',cls:'cat-underdog'};return{label:'Hail Mary',cls:'cat-hailmary'};}
+function fmt(d){return d.toFixed(2);}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');document.getElementById({'page-rank':'tab-rank','page-bet':'tab-bet','page-admin':'tab-admin'}[id]).classList.add('active');if(id==='page-bet')renderBetPage();if(id==='page-rank')renderRankPage();if(id==='page-admin'&&state.adminLoggedIn)renderAdminPanel();}
+let dragSrc=null;
+function renderRankPage(){document.getElementById('rank-locked-banner').style.display=state.rankingsLocked?'flex':'none';document.getElementById('rank-form-wrap').style.display=state.rankingsLocked?'none':'block';renderRankList();renderOddsPreview();}
+function renderRankList(){const list=document.getElementById('rank-list');list.innerHTML='';const cur=list._order||[...state.drivers];const valid=cur.filter(d=>state.drivers.includes(d));state.drivers.forEach(d=>{if(!valid.includes(d))valid.push(d)});list._order=valid;valid.forEach((driver,idx)=>{const li=document.createElement('li');li.className='rank-item';li.draggable=true;li.dataset.driver=driver;li.innerHTML=`<span class="rank-number">${idx+1}</span><span class="rank-driver">${driver}</span><span class="drag-handle">⠿</span>`;li.addEventListener('dragstart',e=>{dragSrc=li;li.classList.add('dragging')});li.addEventListener('dragend',()=>{li.classList.remove('dragging');updateRankNumbers()});li.addEventListener('dragover',e=>{e.preventDefault();li.classList.add('drag-over')});li.addEventListener('dragleave',()=>li.classList.remove('drag-over'));li.addEventListener('drop',e=>{e.preventDefault();li.classList.remove('drag-over');if(dragSrc&&dragSrc!==li){const items=[...list.querySelectorAll('.rank-item')];const si=items.indexOf(dragSrc),ti=items.indexOf(li);if(si<ti)list.insertBefore(dragSrc,li.nextSibling);else list.insertBefore(dragSrc,li);updateRankNumbers();syncListOrder()}});setupTouchDrag(li,list);list.appendChild(li)});}
+function setupTouchDrag(item,list){let sY,sX,clone,oR;item.addEventListener('touchstart',e=>{const t=e.touches[0];sY=t.clientY;sX=t.clientX;oR=item.getBoundingClientRect();clone=item.cloneNode(true);clone.style.cssText=`position:fixed;z-index:9000;width:${oR.width}px;opacity:.85;pointer-events:none;left:${oR.left}px;top:${oR.top}px;background:var(--surface3);border-color:var(--accent);border-radius:10px;`;document.body.appendChild(clone);item.style.opacity='.3'},{passive:true});item.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];clone.style.top=(oR.top+t.clientY-sY)+'px';clone.style.left=(oR.left+t.clientX-sX)+'px';const el=document.elementFromPoint(t.clientX,t.clientY);const tgt=el&&el.closest('.rank-item');list.querySelectorAll('.rank-item').forEach(i=>i.classList.remove('drag-over'));if(tgt&&tgt!==item)tgt.classList.add('drag-over')},{passive:false});item.addEventListener('touchend',e=>{if(clone){clone.remove();clone=null}item.style.opacity='';const t=e.changedTouches[0];const el=document.elementFromPoint(t.clientX,t.clientY);const tgt=el&&el.closest('.rank-item');list.querySelectorAll('.rank-item').forEach(i=>i.classList.remove('drag-over'));if(tgt&&tgt!==item){const items=[...list.querySelectorAll('.rank-item')];const si=items.indexOf(item),ti=items.indexOf(tgt);if(si<ti)list.insertBefore(item,tgt.nextSibling);else list.insertBefore(item,tgt);updateRankNumbers();syncListOrder()}});}
+function updateRankNumbers(){document.querySelectorAll('#rank-list .rank-item').forEach((item,idx)=>item.querySelector('.rank-number').textContent=idx+1);}
+function syncListOrder(){const l=document.getElementById('rank-list');l._order=[...l.querySelectorAll('.rank-item')].map(li=>li.dataset.driver);}
+function getRankingFromList(){return[...document.querySelectorAll('#rank-list .rank-item')].map(li=>li.dataset.driver);}
+function submitRanking(){if(state.rankingsLocked){showToast('Rankings are closed!','error');return;}const name=document.getElementById('rank-name').value.trim()||'Anonymous';state.ballots.push({name,ranking:getRankingFromList()});saveToSheet();document.getElementById('rank-name').value='';renderOddsPreview();if(state.adminLoggedIn)renderAdminPanel();showToast('Rankings submitted! ✅','success');const list=document.getElementById('rank-list');list._order=[...state.drivers].sort(()=>Math.random()-.5);renderRankList();}
+function renderOddsPreview(){const s=getSortedOdds();const body=document.getElementById('odds-preview-body');const nm=document.getElementById('no-odds-msg');if(state.ballots.length===0){body.innerHTML='';nm.style.display='block';return;}nm.style.display='none';body.innerHTML=s.map((d,i)=>{const c=getCategory(i+1);return`<tr><td class="driver-rank">${i+1}</td><td class="driver-name">${NICKNAMES[d.name]||d.name}</td><td><span class="odds-badge ${oddsClass(d.drinks)}">${fmt(d.drinks)} 🍺</span><span class="cat-badge ${c.cls}">${c.label}</span></td></tr>`}).join('');}
+let betSel={};
+function renderBetPage(){EVENTS.forEach(e=>{if(!betSel[e])betSel[e]=new Set()});document.getElementById('bet-locked-banner').style.display=state.bettingLocked?'flex':'none';document.getElementById('bet-form-wrap').style.display=state.bettingLocked?'none':'block';const s=getSortedOdds();document.getElementById('bet-odds-body').innerHTML=s.map((d,i)=>{const c=getCategory(i+1);return`<tr><td class="driver-rank">${i+1}</td><td class="driver-name">${NICKNAMES[d.name]||d.name}</td><td><span class="odds-badge ${oddsClass(d.drinks)}">${fmt(d.drinks)} 🍺</span><span class="cat-badge ${c.cls}">${c.label}</span></td></tr>`}).join('');const om={};s.forEach(d=>om[d.name]=d.drinks);document.getElementById('bet-events-wrap').innerHTML=EVENTS.map(ev=>`<div class="card event-section"><div class="event-title">${ev}<span class="event-counter${betSel[ev]&&betSel[ev].size===3?' complete':''}" id="counter-${ev.replace(/ /g,'_')}">${betSel[ev]?betSel[ev].size:0}/3 selected</span></div><div class="driver-grid">${s.map(d=>`<button class="driver-bet-btn${betSel[ev]&&betSel[ev].has(d.name)?' selected':''}" onclick="toggleBetDriver('${ev}','${d.name}')" id="btn-${ev.replace(/ /g,'_')}-${d.name.replace(/ /g,'_')}"><span><span class="check-icon">✓ </span><span class="dname">${NICKNAMES[d.name]||d.name}</span></span><span class="dodds">${fmt(om[d.name]||2)} 🍺</span></button>`).join('')}</div></div>`).join('');validateBetForm();}
+function toggleBetDriver(ev,driver){if(!betSel[ev])betSel[ev]=new Set();const s=betSel[ev];if(s.has(driver))s.delete(driver);else{if(s.size>=3){showToast('Max 3 drivers per event','error');return;}s.add(driver);}const k=ev.replace(/ /g,'_');const c=document.getElementById(`counter-${k}`);if(c){c.textContent=`${s.size}/3 selected`;c.className='event-counter'+(s.size===3?' complete':'');}const b=document.getElementById(`btn-${k}-${driver.replace(/ /g,'_')}`);if(b)b.className='driver-bet-btn'+(s.has(driver)?' selected':'');validateBetForm();}
+function checkBetName(){const n=document.getElementById('bet-name').value.trim().toLowerCase();document.getElementById('bet-name-warning').style.display=state.bets.some(b=>b.name.toLowerCase()===n)?'block':'none';validateBetForm();}
+function validateBetForm(){const n=document.getElementById('bet-name').value.trim();const ex=n&&state.bets.some(b=>b.name.toLowerCase()===n.toLowerCase());const all=EVENTS.every(e=>betSel[e]&&betSel[e].size===3);document.getElementById('bet-submit-btn').disabled=!n||ex||!all;}
+function submitBet(){if(state.bettingLocked){showToast('Betting is closed!','error');return;}const name=document.getElementById('bet-name').value.trim();if(!name)return;if(state.bets.some(b=>b.name.toLowerCase()===name.toLowerCase())){showToast('Bet already placed!','error');return;}const picks={};EVENTS.forEach(e=>{picks[e]=[...betSel[e]]});state.bets.push({name,picks,timestamp:new Date().toLocaleTimeString()});saveToSheet();EVENTS.forEach(e=>betSel[e]=new Set());document.getElementById('bet-name').value='';document.getElementById('bet-name-warning').style.display='none';showToast(`Bet locked in for ${name}! 🎰`,'success');renderBetPage();if(state.adminLoggedIn)renderAdminPanel();}
+function adminLogin(){if(document.getElementById('admin-pw').value===ADMIN_PASSWORD){state.adminLoggedIn=true;document.getElementById('admin-login-wrap').style.display='none';document.getElementById('admin-panel').style.display='block';renderAdminPanel();}else{document.getElementById('admin-pw-err').style.display='block';}}
+function adminLogout(){state.adminLoggedIn=false;document.getElementById('admin-login-wrap').style.display='block';document.getElementById('admin-panel').style.display='none';document.getElementById('admin-pw').value='';document.getElementById('admin-pw-err').style.display='none';}
+function switchAdminTab(tab,e){document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));if(e&&e.target)e.target.classList.add('active');document.getElementById('admin-'+tab).classList.add('active');renderAdminPanel();}
+function renderAdminPanel(){if(!state.adminLoggedIn)return;renderAdminStats();renderAdminOdds();renderAdminDriverList();renderAdminBets();renderResultsEntry();const btn=document.getElementById('lock-rankings-btn');if(btn){btn.textContent=state.rankingsLocked?'🔓 Reopen Rankings':'🔒 Close Rankings';btn.className=state.rankingsLocked?'btn btn-success btn-full':'btn btn-danger btn-full';}}
+function renderAdminStats(){document.getElementById('admin-stats').innerHTML=`<div class="stat-box"><div class="stat-num">${state.ballots.length}</div><div class="stat-label">Ballots</div></div><div class="stat-box"><div class="stat-num">${state.bets.length}</div><div class="stat-label">Bets</div></div><div class="stat-box"><div class="stat-num">${state.drivers.length}</div><div class="stat-label">Drivers</div></div>`;}
+function renderAdminOdds(){const s=getSortedOdds();document.getElementById('admin-odds-body').innerHTML=s.map((d,i)=>{const c=getCategory(i+1);return`<tr><td class="driver-rank">${i+1}</td><td class="driver-name">${d.name}</td><td><span class="odds-badge ${oddsClass(d.drinks)}">${fmt(d.drinks)} 🍺</span><span class="cat-badge ${c.cls}">${c.label}</span></td><td><input type="number" min="0.25" max="5" step="0.25" style="width:80px;padding:5px 8px;font-size:13px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text)" placeholder="–" value="${state.oddsOverrides[d.name]!==undefined?state.oddsOverrides[d.name]:''}" onchange="setOddsOverride('${d.name}',this.value)"/></td></tr>`}).join('');}
+function setOddsOverride(d,v){if(v===''||v===null)delete state.oddsOverrides[d];else{const n=parseFloat(v);if(!isNaN(n))state.oddsOverrides[d]=Math.round(n*4)/4;}saveToSheet();renderAdminOdds();renderOddsPreview();}
+function renderAdminDriverList(){const w=document.getElementById('admin-driver-list');if(!w)return;w.innerHTML=state.drivers.map((d,i)=>`<div class="driver-admin-row"><input type="text" value="${d}" id="driver-edit-${i}" style="flex:1"/><button class="btn btn-primary btn-sm" onclick="saveDriverEdit(${i})">Save</button><button class="btn btn-danger btn-sm" onclick="removeDriver(${i})">✕</button></div>`).join('');}
+function saveDriverEdit(i){const v=document.getElementById(`driver-edit-${i}`).value.trim();if(!v)return;const old=state.drivers[i];state.drivers[i]=v;state.ballots.forEach(b=>{const ri=b.ranking.indexOf(old);if(ri!==-1)b.ranking[ri]=v});state.bets.forEach(b=>{EVENTS.forEach(e=>{const pi=b.picks[e].indexOf(old);if(pi!==-1)b.picks[e][pi]=v})});if(state.oddsOverrides[old]!==undefined){state.oddsOverrides[v]=state.oddsOverrides[old];delete state.oddsOverrides[old];}saveToSheet();renderAdminPanel();renderRankPage();showToast(`Renamed to ${v}`,'success');}
+function removeDriver(i){const n=state.drivers.splice(i,1)[0];delete state.oddsOverrides[n];saveToSheet();renderAdminPanel();renderRankPage();showToast(`Removed ${n}`,'success');}
+function addDriver(){const inp=document.getElementById('new-driver-input');const n=inp.value.trim();if(!n)return;if(state.drivers.includes(n)){showToast('Already exists','error');return;}state.drivers.push(n);inp.value='';saveToSheet();renderAdminPanel();renderRankPage();showToast(`Added ${n}`,'success');}
+function renderAdminBets(){const bl=document.getElementById('admin-bet-log');const ball=document.getElementById('admin-ballot-log');if(!bl||!ball)return;bl.innerHTML=state.bets.length===0?'<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No bets placed yet.</div>':state.bets.map(b=>`<div class="bet-log-item"><div class="bet-log-name">${b.name} <span style="color:var(--text3);font-size:11px;font-weight:400">@ ${b.timestamp}</span></div><div class="bet-log-detail">${EVENTS.map(e=>`<strong>${e}:</strong> ${b.picks[e].join(', ')}`).join(' &nbsp;|&nbsp; ')}</div></div>`).join('');ball.innerHTML=state.ballots.length===0?'<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No ballots yet.</div>':state.ballots.map(b=>`<div class="bet-log-item"><div class="bet-log-name">${b.name}</div><div class="bet-log-detail">Ranked: ${b.ranking.join(' → ')}</div></div>`).join('');}
+function toggleLockRankings(){state.rankingsLocked=!state.rankingsLocked;saveToSheet();renderAdminPanel();renderRankPage();showToast(state.rankingsLocked?'🔒 Rankings closed!':'🔓 Rankings reopened!','success');}
+function resetBallots(){if(!confirm('Reset all ballots?'))return;state.ballots=[];state.oddsOverrides={};saveToSheet();renderAdminPanel();renderRankPage();showToast('Ballots reset ✓','success');}
+function resetBets(){if(!confirm('Reset all bets?'))return;state.bets=[];saveToSheet();renderAdminPanel();showToast('Bets reset ✓','success');}
+function renderResultsEntry(){const w=document.getElementById('results-entry-wrap');if(!w)return;w.innerHTML=EVENTS.map(ev=>`<div class="result-event"><div class="result-event-title">${ev}</div><select id="result-select-${ev.replace(/ /g,'_')}"><option value="">— Select winner —</option>${state.drivers.map(d=>`<option value="${d}" ${state.results[ev]===d?'selected':''}>${d}</option>`).join('')}</select></div>`).join('');}
+function submitResults(){EVENTS.forEach(ev=>{const s=document.getElementById(`result-select-${ev.replace(/ /g,'_')}`);if(s&&s.value)state.results[ev]=s.value;});saveToSheet();const odds=calcOdds();document.getElementById('results-display-wrap').innerHTML=EVENTS.map(ev=>{const w=state.results[ev];if(!w)return'';const wo=odds[w]?odds[w].drinks:2.0;const bettors=state.bets.filter(b=>b.picks[ev]&&b.picks[ev].includes(w));return`<div class="winner-card"><div class="event-label">🏆 ${ev}</div><div class="winning-driver">${w}</div><div style="margin-bottom:8px"><span class="odds-badge ${oddsClass(wo)}">${fmt(wo)} 🍺</span></div>${bettors.length>0?`<div class="winner-bettors"><strong style="color:var(--text2);font-size:11px;letter-spacing:1px;text-transform:uppercase;">Winners 🎉</strong><br/>${bettors.map(b=>`<span class="bettor-name">${b.name}</span> — earns <strong style="color:var(--green)">${fmt(wo)} 🍺</strong>`).join('<br/>')}</div>`:`<div style="color:var(--text3);font-size:13px;">No one picked ${w} for this event.</div>`}</div>`}).join('')||'<div style="color:var(--text3);font-size:13px;">No results entered yet.</div>';showToast('Results calculated! 🏆','success');}
+let toastTO;
+function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className=`show ${type}`;clearTimeout(toastTO);toastTO=setTimeout(()=>{t.className=''},3000);}
+document.addEventListener('DOMContentLoaded',()=>{renderRankPage();renderBetPage();loadFromSheet();});
 </script>
 </body>
 </html>
